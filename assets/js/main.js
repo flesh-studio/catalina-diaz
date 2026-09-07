@@ -238,7 +238,7 @@
 
     // Generic fade/rise for supporting copy & media
     var riseTargets = document.querySelectorAll(
-      ".about-lead, .about-body, .badge-row, .about-media, .service-card, .gallery-item, .video-item, .mentality-sub, .final-cta .btn, .final-ig, .gallery-note"
+      ".about-lead, .about-body, .badge-row, .about-media, .service-card, .gallery-item, .video-item, .mentality-sub, .testi-soon, .final-cta .btn, .final-ig, .gallery-note"
     );
     riseTargets.forEach(function (el, i) {
       if (reduceMotion) { el.style.opacity = 1; return; }
