@@ -125,7 +125,7 @@
   function animateCounter(el) {
     var target = parseInt(el.getAttribute("data-count-to"), 10);
     var suffix = el.getAttribute("data-suffix") || "";
-    if (reduceMotion) {
+    if (reduceMotion || !hasGSAP) {
       el.textContent = target.toLocaleString("es-AR") + suffix;
       return;
     }
@@ -196,7 +196,7 @@
 
     // Generic fade/rise for supporting copy & media
     var riseTargets = document.querySelectorAll(
-      ".about-lead, .about-body, .badge-row, .about-media, .service-card, .gallery-item, .mentality-sub, .final-cta .btn, .final-ig, .gallery-note"
+      ".about-lead, .about-body, .badge-row, .about-media, .service-card, .gallery-item, .video-item, .mentality-sub, .final-cta .btn, .final-ig, .gallery-note"
     );
     riseTargets.forEach(function (el, i) {
       if (reduceMotion) { el.style.opacity = 1; return; }
@@ -213,11 +213,54 @@
   }
 
   /* ----------------------------------------------------------------------
+     Click-to-play video cards ("Detrás de cámara")
+  ---------------------------------------------------------------------- */
+  function videoCards() {
+    var items = document.querySelectorAll(".video-item");
+    items.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (btn.classList.contains("is-playing")) return;
+
+        // pause/reset any other card already playing
+        document.querySelectorAll(".video-item.is-playing").forEach(function (other) {
+          if (other === btn) return;
+          var v = other.querySelector("video");
+          if (v) v.pause();
+        });
+
+        var src = btn.getAttribute("data-video");
+        var poster = btn.getAttribute("data-poster");
+        var video = document.createElement("video");
+        video.src = src;
+        video.poster = poster;
+        video.controls = true;
+        video.playsInline = true;
+        video.setAttribute("playsinline", "");
+        video.preload = "auto";
+
+        var img = btn.querySelector("img");
+        if (img) img.remove();
+        btn.insertBefore(video, btn.firstChild);
+        btn.classList.add("is-playing");
+
+        video.play().catch(function () {
+          /* autoplay-with-sound can be blocked; controls remain so the user can press play */
+        });
+      });
+    });
+  }
+
+  /* ----------------------------------------------------------------------
      Init
   ---------------------------------------------------------------------- */
+  function safeRun(fn) {
+    try { fn(); } catch (e) { /* one module failing (e.g. a blocked CDN) must not break the rest */ }
+  }
+
   function init() {
-    heroIntro();
-    scrollReveals();
+    safeRun(heroIntro);
+    safeRun(scrollReveals);
+    safeRun(videoCards);
 
     if (hasGSAP) {
       window.addEventListener("load", function () { ScrollTrigger.refresh(); });
