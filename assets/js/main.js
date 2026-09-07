@@ -121,7 +121,6 @@
   /* ----------------------------------------------------------------------
      Animated counter (honest, real numbers only)
   ---------------------------------------------------------------------- */
-  var counters = document.querySelectorAll("[data-count-to]");
   function animateCounter(el) {
     var target = parseInt(el.getAttribute("data-count-to"), 10);
     var suffix = el.getAttribute("data-suffix") || "";
@@ -140,6 +139,49 @@
     });
   }
 
+  /* Slot-machine style "scramble" reveal for non-numeric stats (Megatlon, NPC
+     Wellness) so the whole hero-stats row feels like it's "counting in" together,
+     not just the Instagram number. */
+  function scrambleText(el, finalText, duration) {
+    if (reduceMotion) { el.textContent = finalText; return; }
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    var frameRate = 30;
+    var totalFrames = Math.max(1, Math.round(duration / frameRate));
+    var frame = 0;
+    var timer = setInterval(function () {
+      var revealCount = Math.floor((frame / totalFrames) * finalText.length);
+      var out = "";
+      for (var i = 0; i < finalText.length; i++) {
+        var ch = finalText.charAt(i);
+        out += (ch === " " || ch === " " || i < revealCount)
+          ? ch
+          : chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      el.textContent = out;
+      frame++;
+      if (frame > totalFrames) {
+        el.textContent = finalText;
+        clearInterval(timer);
+      }
+    }, frameRate);
+  }
+
+  function revealStats() {
+    document.querySelectorAll(".hero-stats .stat").forEach(function (stat, i) {
+      var numEl = stat.querySelector(".stat-num");
+      if (!numEl) return;
+      var run = function () {
+        if (numEl.hasAttribute("data-count-to")) {
+          animateCounter(numEl);
+        } else {
+          scrambleText(numEl, numEl.textContent.trim(), 650);
+        }
+      };
+      if (reduceMotion) { run(); return; }
+      setTimeout(run, i * 160);
+    });
+  }
+
   /* ----------------------------------------------------------------------
      Hero intro timeline
   ---------------------------------------------------------------------- */
@@ -154,13 +196,13 @@
       document.querySelectorAll(".hero-sub, .hero-actions, .hero-stats, .hud-tag, .hud-line").forEach(function (el) {
         el.style.opacity = 1;
       });
-      counters.forEach(animateCounter);
+      revealStats();
       return;
     }
 
     gsap.set(".hero .word", { yPercent: 120, opacity: 0 });
     gsap.set(".hero-sub, .hero-actions", { y: 18, opacity: 0 });
-    gsap.set(".hero-stats", { y: 24, opacity: 0 });
+    gsap.set(".hero-stats .stat", { y: 24, opacity: 0 });
     gsap.set(".hud-tag, .hud-line", { opacity: 0 });
     gsap.set(".hero-media img", { scale: 1.18 });
 
@@ -171,8 +213,8 @@
       .to(".hero-sub", { y: 0, opacity: 1, duration: .7 }, .75)
       .to(".hero-actions", { y: 0, opacity: 1, duration: .7 }, .85)
       .to(".hud-tag, .hud-line", { opacity: 1, duration: .6, stagger: .1 }, .9)
-      .to(".hero-stats", { y: 0, opacity: 1, duration: .7 }, .95, )
-      .call(function () { counters.forEach(animateCounter); }, null, 1.1);
+      .to(".hero-stats .stat", { y: 0, opacity: 1, duration: .6, stagger: .16 }, .95)
+      .call(function () { revealStats(); }, null, 1.05);
   }
 
   /* ----------------------------------------------------------------------

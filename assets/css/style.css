@@ -611,7 +611,7 @@ a:focus-visible, button:focus-visible{
   text-align: center;
   position: relative;
 }
-.final-cta-inner{ max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+.final-cta-inner{ max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
 .final-title{
   font-size: clamp(2.6rem, 8vw, 5.6rem);
   line-height: .95;
@@ -704,12 +704,17 @@ a:focus-visible, button:focus-visible{
   .menu-toggle{ display: flex; }
   .mobile-nav{ display: flex; }
 
-  .hero{ grid-template-columns: 1fr; min-height: 100svh; }
-  .hero-media{ grid-column: 1/2; grid-row: 1/2; height: 100svh; }
-  .hero-content{ grid-column: 1/2; grid-row: 1/2; padding: 108px 20px 40px; }
+  .hero{ grid-template-columns: 1fr; min-height: 0; }
+  .hero-media{ grid-column: 1/2; grid-row: 1/2; height: 64svh; }
+  .hero-content{
+    grid-column: 1/2; grid-row: 2/3;
+    justify-content: flex-start;
+    padding: 36px 20px 50px;
+    background: var(--bg);
+  }
   .hero-media-scrim{
     background:
-      linear-gradient(0deg, var(--bg) 0%, rgba(10,10,10,.35) 40%, rgba(10,10,10,.15) 60%, rgba(10,10,10,.55) 100%);
+      linear-gradient(0deg, var(--bg) 0%, rgba(10,10,10,.05) 20%, rgba(10,10,10,0) 46%, rgba(10,10,10,.5) 100%);
   }
   .hero-sub{ max-width: 100%; }
   .hud-tag-2, .hud-bl{ display: none; }
